@@ -1,0 +1,304 @@
+<?php require_once ( 'header.phtml');?>
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-success">
+                <div class="panel-heading">
+
+                    <form id="buttons">
+                    <button type="button" class="btn btn-link" id="clear">Vaciar Tablas</button>
+                    <button type="button" class="btn" id="upload">Importar Registros</button>
+                    <input type="file" id="fileLoader" name="files" title="Load File" style="display:none"/>
+                    <script>
+                     /********************************Actualizar base de datos*******************************/
+                     $(function () {
+                         var campo1, campo2, campo3,campo4,resultado;
+                         $("#updatebd").click(function () {
+
+
+                             $("#tablebecados tbody tr").each(function (index) {
+
+                                 $(this).children("td").each(function (index2) {
+                                     switch (index2) {
+                                         case 0:
+                                             campo1 = $(this).text();
+                                             break;
+                                         case 1:
+                                             campo2 = $(this).text();
+                                             break;
+                                         case 2:
+                                             campo3 = $('.'+campo1+'typebeca').val();
+                                             break;
+                                         case 3:
+                                             campo4 = $('.'+campo1+'periodobeca').val();
+                                             break;
+                                     }
+                                     $(this).css("background-color", "#ECF8E0");
+                                 })
+                                 $.ajax({
+                                     data: {"method":"updatebecado","idalumno":campo1,"tipobeca":campo3,"periodoescolar":campo4},
+                                     type: "POST",
+                                     url: '<?php echo $base_url?>controllers/ajax_controller.php',
+                                     success : function(data) {
+                                         if(data){
+                                             resultado2 = data;
+
+                                         }
+
+                                     }
+
+
+                                 })
+                                 resultado =  index;
+
+                             })
+                             if(resultado!=undefined) {
+                                 alert('Datos Actualizados');
+                                 location.reload();
+
+
+                             }
+
+
+
+                         })
+
+                     })
+                     /****************************************** ********************************************/
+
+                     /**********************************Import*******************************************/
+                        var file = undefined;
+                        //Ejecuta funcion cuando hacemos en el boton "Importar Registro"
+                        $('#upload').on('click', function() {
+                            //Se ejecuta click al opendialog para seleccionar el archivo
+                            $("#fileLoader").click();
+
+                        });
+                        // Funcion que valida que se selecciono el archivo
+                        function handleFileSelect(evt) {
+                            var files = evt.target.files; // FileList object
+                           // files is a FileList of File objects. List some properties.
+                            var output=[];
+                            output.push(escape(files.name));
+
+                            file = output.join('');
+                            if(file !=undefined){
+
+                                 var file_data = $('#fileLoader').prop('files')[0];
+                                 var form_data = new FormData();
+                                 form_data.append('file', file_data);
+
+                                 $.ajax({
+                                 url: '<?php echo $base_url?>controllers/ajax_controller.php', // point to server-side PHP script
+                                 dataType: 'text', // what to expect back from the PHP script
+                                 cache: false,
+                                 contentType: false,
+                                 processData: false,
+                                 data: form_data,
+                                 type: 'post',
+                                 success: function (response) {
+                                    // alert(response);
+                                     if(response){
+                                         alert('Se han importados los datos');
+                                     }
+
+                                     $( "#btnCloseFileDialog" ).click();
+                                     $( "#btnCloseFileDialog" ).click(function() {
+                                         $( "#buttons" ).submit(function( event ) {
+                                             event.preventDefault();
+                                         });
+
+                                     });
+
+                                 $('#msg').html(response); // display success response from the PHP script
+                                 },
+                                 error: function (response) {
+                                 $('#msg').html(response); // display error response from the PHP script
+                                 }
+                                 });
+
+                            }
+                        }
+                        document.getElementById('fileLoader').addEventListener('change', handleFileSelect, false);
+                     /********************************** ***************************************************/
+
+                     /****************************************clear****************************************/
+                     $('#clear').on('click', function() {
+                        $.ajax({
+                             data: {"method":"clear"},
+                             type: "POST",
+                             url: '<?php echo $base_url?>controllers/ajax_controller.php',
+                             success : function(data) {
+                                 if(data){
+                                     alert(data);
+                                     location.reload();
+                                 }
+
+                             }
+
+
+                         })
+                     });
+                     /****************************************** *******************************************/
+                    /********************************Mostrar/Ocultar Combo matriculas***********************/
+                    function togglecombo() {
+                        var x = document.getElementById("combomat");
+                        if (x.style.display === "block") {
+                            x.style.display = "none";
+                        } else {
+                            x.style.display = "block";
+                        }
+                    }
+                    /***************************************** *********************************************/
+
+                     /********************************Analizar becas ***********************/
+                     function analizarbeca() {
+                         $("#becaanalizada").css("display","block");
+                         var id = $('#id_alumno').val();
+                         if(id!=undefined) {
+                             $.ajax({
+                                 data: {"idalumno":id,"method":"analizarbeca"},
+                                 type: "POST",
+                                 url: '<?php echo $base_url?>controllers/ajax_controller.php',
+                                 success : function(data) {
+                                     if(data){
+
+                                         $("#becasanalizadas").html(data);
+                                     }
+
+                                 }
+
+
+                             })
+                         }
+                     }
+                     /***************************************** *********************************************/
+
+                     /********************************Create PDF*******************************/
+                     function createpdf() {
+                         //window.location = '<?php //echo $base_url?>controllers/ajax_controller.php?method=getbecasbyalum';
+                         window.open(
+                                 '<?php echo $base_url?>controllers/ajax_controller.php?method=getbecasbyalum',
+                                 '_blank' // <- This is what makes it open in a new window.
+                         );
+
+                             /*$.ajax({
+                                 data: {"method":"getbecasbyalum"},
+                                 type: "POST",
+                                 url: '<?php //echo $base_url?>controllers/ajax_controller.php',
+                                 success : function(data) {
+                                     if(data){
+                                         console.log(data);
+                                         $("#becasbymat").html(data);
+                                     }
+
+                                 }
+
+
+                             })*/
+
+                     }
+                     /****************************************** ********************************************/
+                    </script>
+                    <button type="button" onclick="togglecombo()"; class="btn btn-default">Cargar Combo</button>
+                    <button id="updatebd" type="button" class="btn btn-primary">Actualizar Base de Datos</button>
+                    <button type="button" onclick="analizarbeca()" class="btn btn-success">Analizar Becas</button>
+                    <!--<button type="button" class="btn btn-info">Info</button>-->
+                    <button type="button" onclick="createpdf()" class="btn btn-warning">Generar PDF</button>
+                    <!--<button type="button" class="btn btn-danger">Danger</button>-->
+                        <input type="reset" id="btnCloseFileDialog" style="display:none"/>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+        <div id="combomat" class="col-md-12 panel-success ">
+            <div class="col-md-12 panel  panel-heading">
+                <div class="col-md-3" >
+                        <span>
+                        Matricula
+                        &nbsp;
+                         </span>
+                    <select id="mat" >
+                        <option>Seleccione matricula</option>
+                        <?php foreach ($datos as $dato) {?>
+                            <option value="<?php echo $dato["id"]; ?>"><?php echo $dato["matricula"]; ?></option>
+
+                            <?php
+                        }
+                        ?>
+
+                    </select>
+                </div>
+                <div class="alumnosofselect col-md-9"></div>
+                <script>
+
+                        $('#mat').on('change', function() {
+                            $("#becaanalizada").css("display","none");
+
+                            $.ajax({
+                                data: {"idalumno" : this.value,"method":"getalumnosbyselect"},
+                                type: "POST",
+                                url: '<?php echo $base_url?>controllers/ajax_controller.php',
+                                success : function(data) {
+
+                                    $('.alumnosofselect').html(data);
+
+                                    if(data){
+                                        var id_alumno = $('#id_alumno').val();
+
+                                        $.ajax({
+                                            data: {"idalumno" : id_alumno,"method":"getbecado"},
+                                            type: "POST",
+                                            url: '<?php echo $base_url?>controllers/ajax_controller.php',
+                                            success : function(data) {
+
+                                                $("#becados").html(data);
+
+
+
+                                            }
+
+
+                                        })
+
+                                    }
+                                }
+
+
+                            });
+
+
+})
+                    </script>
+            </div>
+        </div>
+
+        <div class="col-md-12 panel-success">
+            <div class="col-md-12 panel panel-heading">
+                <div id="becados" class="col-md-12 "></di>
+            </div>
+        </div>
+
+        <div id="becaanalizada" class="col-md-12 panel-success">
+            <div class="col-md-12 panel panel-heading">
+                <div id="becasanalizadas" class="col-md-12 "></di>
+                </div>
+
+        </div>
+
+
+</div>
+
+            <div class="col-md-12 panel-success">
+                <div class="col-md-12 panel panel-heading">
+                    <div id="becasbymat" class="col-md-12 "></di>
+                    </div>
+
+                </div>
+
+            </div>
+
+<?php require_once ( 'footer.phtml');?>

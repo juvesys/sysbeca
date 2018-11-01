@@ -1,0 +1,13 @@
+<?php foreach ($datos as $dato) {?>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <span id="nombre"><?php echo $dato["nombre"]; ?></span>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <span><?php echo $dato["carrera"]; ?></span>
+    <input id="id_alumno" type="hidden" value="<?php echo $dato["id"] ?>">
+
+
+    <?php
+}
+?>
+
+

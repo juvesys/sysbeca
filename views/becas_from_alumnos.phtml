@@ -1,0 +1,138 @@
+<div class="col-md-12">
+
+<table id="tablebecados" class="table table-hover">
+    <thead>
+
+    <tr>
+        <th>Matricula</th>
+        <th>Tipo de Beca</th>
+        <th>Periodo Escolar</th>
+        <th class="text-center">Action</th>
+    </tr>
+    </thead>
+
+    <tbody>
+
+    <?php if($becados) {
+        $i = 0;
+        foreach ($becados as $beca) { $i++?>
+            <tr>
+
+
+                <td style="display:none;"><?php echo $beca["id"]; ?></td>
+                <td><?php echo $beca["matricula"]; ?></td>
+                <td>
+                    <select id="<?php echo $beca["matricula"].'-'.$i; ?>"  class="<?php echo $beca["id"]; ?>typebeca">
+                        <option value="0">Seleccione beca</option>
+                        <option value="Alimenticia">Alimenticia</option>
+                        <option value="Excelencia">Excelencia</option>
+                            <script>
+                                /*$("#ddlServiceCategoryType").val(function () {
+                                    return $(this).find('option:eq(1)').attr('value')
+                                });*/
+                                $( document ).ready(function() {
+
+                                    $('#<?php echo $beca["matricula"].'-'.$i; ?> option[value="<?php echo $beca["tipobeca"]; ?>"]').attr("selected","selected");
+                                    //$('#<?php //echo $beca["matricula"].'-'.$i; ?> option:contains("<?php //echo $beca["tipobeca"]; ?>")').prop('selected',true);
+
+                                });
+                            </script>
+                    </select>
+                </td>
+                <td><select id="p<?php echo $beca["matricula"].'-'.$i; ?>" class="<?php echo $beca["id"]; ?>periodobeca">
+                        <option value="0">Seleccione periodo</option>
+                        <option value="Enero Abril 2015">Enero Abril 2015</option>
+                        <option value="Mayo Agosto 2016">Mayo Agosto 2016</option>
+                        <script>
+                            $( document ).ready(function() {
+                                $('#p<?php echo $beca["matricula"].'-'.$i; ?> option[value="<?php echo $beca["periodoescolar"]; ?>"]').attr("selected",true);
+                                //$('#p<?php //echo $beca["matricula"].'-'.$i; ?> option:contains("<?php //echo $beca["periodoescolar"]; ?>")').prop('selected',true);
+
+                            });
+                        </script>
+                    </select></td>
+                <td class="text-center"><a href="javascript:deleterow(<?php echo $beca["id"]; ?>,<?php echo $beca["id_alumno"]; ?>);" class="btn btn-danger btn-xs"><span class="glyphicon glyphicon-remove"></span> Del</a></td>
+                </form>
+            </tr>
+        <?php }
+    }?>
+    </tbody>
+</table>
+</div>
+<div class="col-md-12"><button  id="addrow" class="btn btn-warning btn-xs"><span class="glyphicon glyphicon-ok"></span> Adicionar Registro de Beca</button></div>
+<script>
+    /****************************************Add row****************************************/
+    $('#addrow').on('click', function() {
+         var id = $('#mat').val();
+
+
+
+
+        $.ajax({
+            data: {"idalumno" : id,"method":"addbecado"},
+            type: "POST",
+            url: '<?php echo $base_url?>/ajax_controller.php',
+            success : function(data) {
+                if(data){
+                    console.log(data);
+                    $.ajax({
+                        data: {"idalumno" : data,"method":"getbecado"},
+                        type: "POST",
+                        url: '<?php echo $base_url?>/ajax_controller.php',
+                        success : function(data) {
+
+                            $("#becados").html(data);
+
+
+
+                        }
+
+
+                    })
+                }
+
+            }
+
+
+        })
+    });
+    /****************************************** *******************************************/
+
+    /****************************************Delete row****************************************/
+    function deleterow(id,id_alumno){
+        $.ajax({
+            data: {"idbecado" : id,"method":"deletebecado","idalumno":id_alumno},
+            type: "POST",
+            url: '<?php echo $base_url?>/ajax_controller.php',
+            success : function(data) {
+                if(data){
+
+                    $.ajax({
+                        data: {"idalumno" : data,"method":"getbecado"},
+                        type: "POST",
+                        url: '<?php echo $base_url?>/ajax_controller.php',
+                        success : function(data) {
+
+                            $("#becados").html(data);
+
+
+
+                        }
+
+
+                    })
+                }
+
+            }
+
+
+        })
+    }
+
+    /****************************************** *******************************************/
+
+</script>
+
+
+
+

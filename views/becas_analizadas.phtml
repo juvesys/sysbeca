@@ -1,0 +1,18 @@
+El alumno <span id="alumno"></span>, ha tenido
+<script>
+    $( document ).ready(function() {
+        var nombre = $('#nombre').text();
+
+        $('#alumno').text(nombre);
+
+
+    });
+</script>
+<?php foreach ($cantbecas as $beca) {?>
+    <span><?php echo $beca["cantidad"]." becas en "; ?></span>
+
+    <span><?php echo $beca["periodoescolar"].","; ?></span>
+   <?php
+    }
+    ?>
+

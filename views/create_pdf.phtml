@@ -1,0 +1,178 @@
+<?php
+require_once('../models/tcpdf/tcpdf.php');
+
+$pdf = new TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
+
+
+
+
+$pdf->SetCreator(PDF_CREATOR);
+$pdf->SetAuthor('Reporte');
+$pdf->SetTitle('Reporte');
+
+$pdf->setPrintHeader(false);
+$pdf->setPrintFooter(false);
+$pdf->SetMargins(20, 20, 20, false);
+$pdf->SetAutoPageBreak(true, 20);
+$pdf->SetFont('Helvetica', '', 10);
+
+// set page format (read source code documentation for further information)
+// MediaBox - width = urx - llx 210 (mm), height = ury - lly = 297 (mm) this is A4
+$page_format = array(
+        'MediaBox' => array ('llx' => 0, 'lly' => 0, 'urx' => 216, 'ury' => 279),
+    //'MediaBox' => array ('llx' => 0, 'lly' => 0, 'urx' => 210, 'ury' => 297),
+    //'CropBox' => array ('llx' => 0, 'lly' => 0, 'urx' => 210, 'ury' => 297),
+    //'BleedBox' => array ('llx' => 5, 'lly' => 5, 'urx' => 205, 'ury' => 292),
+    //'TrimBox' => array ('llx' => 10, 'lly' => 10, 'urx' => 200, 'ury' => 287),
+    //'ArtBox' => array ('llx' => 15, 'lly' => 15, 'urx' => 195, 'ury' => 282),
+        'Dur' => 3,
+        'trans' => array(
+                'D' => 1.5,
+                'S' => 'Split',
+                'Dm' => 'V',
+                'M' => 'O'
+        ),
+        'Rotate' => 0,
+        'PZ' => 1,
+);
+//$pdf->addPage();
+$pdf->AddPage('P', $page_format, false, false);
+
+
+
+
+$content = '';
+
+$content .='
+<div class="row">
+        	
+            	
+      <table border="1" cellpadding="5">
+        	<tr>
+        	<td WIDTH="10%"><img class="logo" src="../images/logo.jpg" width=100></td>
+        	<td WIDTH="90%">
+        	<h1 style="text-align:center;">Reporte</h1>
+            </td>
+            </tr>
+            
+        	</table></br> 	
+      <table border="1" cellpadding="5">';
+$content .= '<thead>
+
+    <tr>
+        <th>Matricula</th>
+        <th>Cantidad</th>
+        <th>Tipo de Beca</th>
+        <th>Periodo Escolar</th>
+    </tr>
+    </thead>';
+foreach ($becados as $dato) {
+    $content .= '<tbody class="panel-heading">';
+    $i++;
+    $ii = 0;
+    $id_alumno = $dato["id"];
+
+    $sql = "SELECT matricula, COUNT(id_alumno) AS cantidad,tipobeca, periodoescolar FROM becados WHERE id_alumno=" . $id_alumno . " GROUP BY periodoescolar";
+    $result = $conexion->query($sql);
+    $becas = $result->fetch_all(MYSQLI_ASSOC);
+    foreach ($becas as $beca) {
+        $content .='<tr>
+            <td>'. $becas[$ii]["matricula"].'</td>
+        <td>'.$becas[$ii]["cantidad"].'</td>
+        <td>'.$becas[$ii]["tipobeca"].' </td>
+        <td>'.$becas[$ii]["periodoescolar"].'</td>
+        </tr>';
+    }
+    $content .='</tbody>';
+}
+
+$content .= '</table>';
+
+
+$content .= '
+		<div class="row padding">
+        	<div class="col-md-12" style="text-align:center;">
+            	<span></span>
+            </div>
+        </div>
+    	
+	';
+
+$pdf->writeHTML($content, true, 0, true, 0);
+
+$pdf->lastPage();
+$pdf->output('Reporte.pdf', 'I');
+
+
+?>
+<?php /*
+<table class="table table-hover">
+    <thead>
+
+    <tr>
+        <th>Matricula</th>
+        <th>Cantidad</th>
+        <th>Tipo de Beca</th>
+        <th>Periodo Escolar</th>
+
+    </tr>
+    </thead>
+
+    <?php
+    foreach ($becados as $dato) {?>
+
+        <tbody class="panel-heading">
+        <?php
+        $i++;
+        $ii=0;
+        $id_alumno = $dato["id"];
+
+        $sql="SELECT matricula, COUNT(id_alumno) AS cantidad,tipobeca, periodoescolar FROM becados WHERE id_alumno=".$id_alumno." GROUP BY periodoescolar";
+        $result = $conexion->query($sql);
+        $becas = $result->fetch_all(MYSQLI_ASSOC);
+        foreach($becas as $beca){
+            ?>
+                <tr>
+                    <td><?php echo $becas[$ii]['matricula'] ?></td>
+                    <td><?php echo $becas[$ii]['cantidad'] ?></td>
+                    <td><?php echo $becas[$ii]['tipobeca'] ?></td>
+                    <td><?php echo $becas[$ii]['periodoescolar']?></td>
+                </tr>
+
+
+        <?php
+        }
+
+
+
+        ?>
+    </tbody>
+
+    <?php
+    }
+    ?>
+
+
+
+
+
+
+
+
+</table>
+*/?>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
